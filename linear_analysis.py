@@ -1,8 +1,6 @@
-import sys
-import time
+import random
 
 import numpy as np
-
 import simple_cipher as sc
 import util
 
@@ -53,107 +51,29 @@ def bitwise_xor(num):
     return res
 
 
-def crack_5_round(p_list: list, c_list: list):
-    # last round
-    # res = np.zeros((16, 16))
-    # for i in range(16):
-    #     for j in range(16):
-    #         count = 0
-    #         key = (i << 8) | j
-    #         for k in range(10000):
-    #             p = p_list[k] & 0x0B00
-    #             c = sc.use_s_box_rev(c_list[k] ^ key) & 0x0505
-    #             if util.bit_xor(p, c) == 0:
-    #                 count += 1
-    #         res[i][j] = abs(count - 5000) / 10000
-    # r, c = np.where(res == np.max(res))
-
+def crack_5_round_partial(p_list: list, c_list: list):
     res = np.zeros((16, 16))
     for i in range(16):
         for j in range(16):
             count = 0
-            key = (i << 4) | j
-            for k in range(10000):
-                p = p_list[k] & 0x0001
-                c = sc.use_s_box_rev(c_list[k] ^ key) & 0x0077
-                if util.bit_xor(p, c) == 0:
-                    count += 1
-            res[i][j] = abs(count - 5000) / 10000
-    r1, c1 = np.where(res == np.max(res))
-    print(r1[0])
-    print(c1[0])
-
-
-def crack_4_round(sub_key_5: int, p_list: list, c_list: list):
-    res = np.zeros((16, 16))
-    for i in range(16):
-        for j in range(16):
-            count = 0
-            count = 0
-            key = (i << 8) | j & 0x0505
+            key = (i << 8) | j
             for k in range(10000):
                 p = p_list[k] & 0x0B00
-                c = sc.use_s_box_rev(c_list[k] ^ sub_key_5)
-                c = sc.use_p_box(c ^ key)
-                c = sc.use_s_box_rev(c) & 0x0404
+                c = sc.use_s_box_rev(c_list[k] ^ key) & 0x0505
                 if util.bit_xor(p, c) == 0:
                     count += 1
             res[i][j] = abs(count - 5000) / 10000
     r, c = np.where(res == np.max(res))
-    print(np.max(res))
-    key4 = r << 8 | c
-    print(res[c[0]][r[0]])
-    print(r[0])
-    print(c[0])
+    return r[0], c[0]
 
 
-all_res = []
-
-
-def recursive(num, i, res: list):
-    global all_res
-    if num == 0:
-        return
-    if i == 4:
-        all_res.append(res)
-    active_boxes = util.get_active_box(num)
-    mask = util.get_available_int_by_active_box(active_boxes)
-    res.append(active_boxes)
-    for i in range(256):
-        n_res = res[:]
-        n = i & mask
-        n = sc.use_p_box(n)
-        recursive(n, i + 1, n_res)
-
-
-def test():
-    f = open('plain', 'r')
-    p_list = [int(s) for s in f.readlines()]
-    f.close()
-    f = open('cipher', 'r')
-    c_list = [int(s) for s in f.readlines()]
-    f.close()
-    f = open('key', 'r')
-    key_list = [int(s) for s in f.readlines()]
-    f.close()
-
-    real_key5_bits = util.convert_int_16_bits_to_bin(key_list[4])
-    real_key4_bits = util.convert_int_16_bits_to_bin(key_list[3])
-    key1 = util.convert_bits_to_int(real_key5_bits[4:8])
-    key2 = util.convert_bits_to_int(real_key5_bits[12:16])
-    key3 = util.convert_bits_to_int(real_key5_bits[0:4])
-    key4 = util.convert_bits_to_int(real_key5_bits[8:12])
-    print("key52:" + str(key1) + "   key54:" + str(key2))
-    print("key42:" + str(key3) + "   key44:" + str(key4))
-
-    start = time.time()
-    crack_5_round(p_list, c_list)
-    linear_approximation_table()
-    print()
-    print(time.time() - start)
-
-
-sys.setrecursionlimit(256 * 256 * 256)
-recursive(1, 1, [])
-
-print(sys.getrecursionlimit())
+def generate_linear_test_data():
+    p_list = []
+    c_list = []
+    sub_keys_list = [random.randint(0, 2 ** 16 - 1) for _ in range(5)]
+    for i in range(10000):
+        p = random.randint(0, 2 ** 16 - 1)
+        c = sc.encrypt(p, sub_keys_list)
+        p_list.append(p)
+        c_list.append(c)
+    return p_list, c_list, sub_keys_list

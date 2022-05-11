@@ -1,3 +1,6 @@
+import random
+
+
 def convert_int_16_bits_to_bin(num: int):
     binary = bin(num)[2:]
     res = [int(c) for c in binary]
@@ -64,3 +67,28 @@ def bit_xor(*n):
         for b in convert_int_16_bits_to_bin(i):
             res ^= b
     return res
+
+
+def write_data_to_file(p_list: list, c_list: list, sub_key_list: list, analysis_type: str):
+    f1 = open('plain_' + analysis_type, 'w')
+    f2 = open('cipher_' + analysis_type, 'w')
+    f3 = open('key_' + analysis_type, 'w')
+    [f1.write(str(p) + "\n") for p in p_list]
+    [f2.write(str(c) + "\n") for c in c_list]
+    [f3.write(str(key) + "\n") for key in sub_key_list]
+    f1.close()
+    f2.close()
+    f3.close()
+
+
+def load_data(analysis_type: str):
+    f = open('plain_' + analysis_type, 'r')
+    p_list = [int(s) for s in f.readlines()]
+    f.close()
+    f = open('cipher_' + analysis_type, 'r')
+    c_list = [int(s) for s in f.readlines()]
+    f.close()
+    f = open('key_' + analysis_type, 'r')
+    key_list = [int(s) for s in f.readlines()]
+    f.close()
+    return p_list, c_list, key_list

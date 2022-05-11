@@ -86,22 +86,3 @@ def use_p_box(num):
     bits = util.convert_int_16_bits_to_bin(num)
     p_box_inner(bits)
     return util.convert_bits_to_int(bits)
-
-
-def asdfdsafdasfdfs():
-    f1 = open('plain', 'w')
-    f2 = open('cipher', 'w')
-    f3 = open('key', 'w')
-    key_list = [random.randint(0, 2 ** 16 - 1) for _ in range(5)]
-    [f3.write(str(key) + "\n") for key in key_list]
-    for i in range(10000):
-        p = random.randint(0, 2 ** 16 - 1)
-
-        c = encrypt(p, key_list)
-        re = decrypt(c, key_list)
-        assert re == p
-        f1.write(str(p) + "\n")
-        f2.write(str(c) + "\n")
-    f1.close()
-    f2.close()
-    f3.close()
