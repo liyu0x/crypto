@@ -15,26 +15,37 @@ def generate_data():
 
 
 def test_linear():
+    print("-----------------------------------")
+    print("starting linear cryptanalysis")
     p_list, c_list, key_list = util.load_data('linear')
     real_key5_bits = util.convert_int_16_bits_to_bin(key_list[4])
     key1 = util.convert_bits_to_int(real_key5_bits[4:8])
     key2 = util.convert_bits_to_int(real_key5_bits[12:16])
     start = time.time()
     re_key1, re_key2 = la.crack_5_round_partial(p_list, c_list)
-    print(time.time() - start)
-    assert re_key1 == key1 and re_key2 == key2
+    print("correct key1:{}     correct key2:{}".format(key1, key2))
+    print("recovered key1:{}     recovered key2:{}".format(re_key1, re_key2))
+    print("time: {} s".format(time.time() - start))
 
 
 def test_differ():
+    print("-----------------------------------")
+    print("starting linear cryptanalysis")
     p_list, c_list, key_list = util.load_data('differ')
     real_key5_bits = util.convert_int_16_bits_to_bin(key_list[4])
     key1 = util.convert_bits_to_int(real_key5_bits[4:8])
     key2 = util.convert_bits_to_int(real_key5_bits[12:16])
-    print("k52:" + str(key1) + "|k52:" + str(key2))
+    start = time.time()
     re_key1, re_key2 = da.crack_5th_round_partial(p_list, c_list)
-    assert re_key1 == key1 and re_key2 == key2
+    print("correct key1:{}     correct key2:{}".format(key1, key2))
+    print("recovered key1:{}     recovered key2:{}".format(re_key1, re_key2))
+    print("time: {} s".format(time.time() - start))
 
 
 def test():
     test_linear()
     test_differ()
+
+
+if __name__ == '__main__':
+    test()
