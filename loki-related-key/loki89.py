@@ -3,7 +3,6 @@ import copy
 
 SIZE = 256
 MSB = 0x80000000
-MASK12 = 0x0fff
 
 P = [
     31, 23, 15, 7, 30, 22, 14, 6,
@@ -79,27 +78,27 @@ def mult8(a: int, b: int, gen: int):
 
 
 def s(i: int):
-    # return short:16 bits
     r = ((i >> 8) & 0xc) | (i & 0x3)
-    r &= 0xFFFF
     c = (i >> 2) & 0xff
-    c &= 0xFFFF
     t = c ^ r
     v = exp8(t, sfn[r][0], sfn[r][1])
-
     length = (len(bin(v)) - 2)
     if length > 16:
         print("s function result bits:" + str(length))
     return v
 
 
+MASK12 = 0x0fff
+
+
 def f(r, k):
-    a = r ^ k
-    b = (s((a & MASK12)) & 0xFFFFFFFF) | \
-        (0xFFFFFFFF & (s(((a >> 8) & MASK12)) << 8)) | \
-        (0xFFFFFFFF & (s(((a >> 16) & MASK12)) << 16)) | \
-        (0xFFFFFFFF & (s((((a >> 24) | (a << 8)) & MASK12))) << 24)
-    return perm32(b)
+    # a = r ^ k
+    # b = (s((a & MASK12)) & 0xFFFFFFFF) | \
+    #     (0xFFFFFFFF & (s(((a >> 8) & MASK12)) << 8)) | \
+    #     (0xFFFFFFFF & (s(((a >> 16) & MASK12)) << 16)) | \
+    #     (0xFFFFFFFF & (s((((a >> 24) | (a << 8)) & MASK12))) << 24)
+    # # return perm32(b)
+    return r ^ k
 
 
 def en_loki(block: list, keys: list):
@@ -123,17 +122,17 @@ def de_loki(block: list, keys: list):
     k_l = keys[0]
     k_r = keys[1]
 
-    l_b = block[0] ^ k_r
-    r_b = block[1] ^ k_l
+    r_b = block[0] ^ k_r
+    l_b = block[1] ^ k_l
 
     for i in range(8):
         ror12(k_r)
-        l_b ^= f(r_b, k_r)
+        r_b ^= f(l_b, k_r)
         ror12(k_l)
-        r_b = f(l_b, k_l)
+        l_b ^= f(r_b, k_l)
 
-    block[0] = r_b ^ k_l
-    block[1] = l_b ^ k_r
+    block[0] = l_b ^ k_l
+    block[1] = r_b ^ k_r
 
 
 def test():
@@ -144,12 +143,12 @@ def test():
 
     keys = util.split_64_bits_to_groups(key)
     pls = util.split_64_bits_to_groups(plaintext)
+    print(pls)
     en_loki(pls, keys)
 
     de_loki(pls, keys)
-
+    print(pls)
     res = util.merge_group_to_64_bits(pls)
-    print(hex(res))
 
 
 test()
