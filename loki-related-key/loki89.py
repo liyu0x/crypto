@@ -3,7 +3,6 @@ import copy
 
 SIZE = 256
 MSB = 0x80000000
-MASK12 = 0x0fff
 
 P = [
     31, 23, 15, 7, 30, 22, 14, 6,
@@ -93,6 +92,9 @@ def s(i: int):
     return v
 
 
+MASK12 = 0x0fff
+
+
 def f(r, k):
     a = r ^ k
     b = (s((a & MASK12)) & 0xFFFFFFFF) | \
@@ -123,8 +125,8 @@ def de_loki(block: list, keys: list):
     k_l = keys[0]
     k_r = keys[1]
 
-    l_b = block[0] ^ k_r
-    r_b = block[1] ^ k_l
+    r_b = block[0] ^ k_r
+    l_b = block[1] ^ k_l
 
     for i in range(8):
         ror12(k_r)
@@ -149,7 +151,8 @@ def test():
     de_loki(pls, keys)
 
     res = util.merge_group_to_64_bits(pls)
-    print(hex(res))
+    print(res)
+    print(plaintext)
 
 
 test()
