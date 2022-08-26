@@ -1,15 +1,12 @@
-import util
 import copy
+import random
+
+import util
 
 SIZE = 256
-MSB = 0x80000000
 
-P = [
-    31, 23, 15, 7, 30, 22, 14, 6,
-    29, 21, 13, 5, 28, 20, 12, 4,
-    27, 19, 11, 3, 26, 18, 10, 2,
-    25, 17, 9, 1, 24, 16, 8, 0
-]
+P = [22, 31, 2, 8, 12, 18, 24, 19, 3, 17, 20, 29, 4, 26, 27, 30, 25, 9, 5, 7, 10, 28, 0, 23, 6, 16, 13, 14, 21, 11, 15,
+     1]
 
 sfn = [  # [gen, exp]
     [375, 31],  # 101110111
@@ -40,12 +37,15 @@ def ror12(b):
     return (b >> 12) | (b << 20)
 
 
+MSB = 0x80000000
+
+
 def perm32(num: int):
-    num_bits = util.convert_int_to_32_bin(num)
-    temp = copy.deepcopy(num_bits)
+    bits = util.convert_int_to_32_bin(num)
+    res = copy.deepcopy(bits)
     for i in range(32):
-        num_bits[i] = temp[P[i]]
-    return util.convert_bits_to_int(num_bits)
+        res[i] = bits[P[i]]
+    return util.convert_bits_to_int(res)
 
 
 def exp8(base: int, exponent: int, gen: int):
@@ -92,13 +92,15 @@ MASK12 = 0x0fff
 
 
 def f(r, k):
-    # a = r ^ k
-    # b = (s((a & MASK12)) & 0xFFFFFFFF) | \
-    #     (0xFFFFFFFF & (s(((a >> 8) & MASK12)) << 8)) | \
-    #     (0xFFFFFFFF & (s(((a >> 16) & MASK12)) << 16)) | \
-    #     (0xFFFFFFFF & (s((((a >> 24) | (a << 8)) & MASK12))) << 24)
-    # # return perm32(b)
-    return r ^ k
+    a = r ^ k
+    b = (s((a & MASK12)) & 0xFFFFFFFF) | \
+        (0xFFFFFFFF & (s(((a >> 8) & MASK12)) << 8)) | \
+        (0xFFFFFFFF & (s(((a >> 16) & MASK12)) << 16)) | \
+        (0xFFFFFFFF & (s((((a >> 24) | (a << 8)) & MASK12))) << 24)
+    return perm32(b)
+
+
+print(f(1082667520, 9))
 
 
 def en_loki(block: list, keys: list):
@@ -150,4 +152,4 @@ def test():
     print(pls)
     res = util.merge_group_to_64_bits(pls)
 
-test()
+# test()
