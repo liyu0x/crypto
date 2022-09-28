@@ -9,6 +9,14 @@ def convert_int_16_bits_to_bin(num: int):
     return res
 
 
+def convert_int_64_bits_to_bin(num: int):
+    binary = bin(num)[2:]
+    res = [int(c) for c in binary]
+    for z in range(len(res), 64):
+        res.insert(0, 0)
+    return res
+
+
 def convert_int_4_bits_to_bin(num: int):
     binary = bin(num)[2:]
     res = [int(c) for c in binary]
