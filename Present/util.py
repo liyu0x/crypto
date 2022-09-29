@@ -118,12 +118,13 @@ def compute_prob(out_differ: int, round_num: int, prob: float, record_list: list
     for out_differ_list in usable_out_differ:
         dif = list(out_differ_list)
         out_dif = bits_to_int_by_active_box(dif, in_differs)
-        prob = prob * compute_single_layer_probability(in_differs, dif)
+        n_pro = compute_single_layer_probability(in_differs, dif)
+        prob = prob * n_pro
         if prob == 0:
             return
         n_l = copy.deepcopy(record_list)
         n_out_diff = present.apply_p_box(out_dif)
-        n_l.append([record_list[len(record_list) - 1][1], n_out_diff, prob, total_active_num])
+        n_l.append([record_list[len(record_list) - 1][1], n_out_diff, n_pro, total_active_num])
         compute_prob(n_out_diff, round_num + 1, prob, n_l, total_active_num)
 
 
@@ -177,7 +178,7 @@ def format_print(records: list):
         if index == 0:
             print("w=1", end=", ")
         else:
-            print('w=%d' % record[2], end=",")
+            print('w=%d' % math.log(record[2]), end=",")
         print('all active boxes:%#d' % record[3], end="] ")
 
     print()
