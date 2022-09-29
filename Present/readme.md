@@ -1,6 +1,3 @@
-# have some bugs, fixing
-
-
 # PRESENT CIPHER DDT
 
 ![DDT](https://github.com/liyu0x/crypto/blob/main/Present/ddt.jpg?raw=true)

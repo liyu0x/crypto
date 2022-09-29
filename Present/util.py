@@ -177,7 +177,7 @@ def format_print(records: list):
         if index == 0:
             print("w=1", end=", ")
         else:
-            print('w=%d' % math.log2(record[2]), end=",")
+            print('w=%d' % record[2], end=",")
         print('all active boxes:%#d' % record[3], end="] ")
 
     print()
