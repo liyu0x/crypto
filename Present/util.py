@@ -1,19 +1,25 @@
 import copy
+import datetime
+import math
 
 import present
 import numpy as np
 import matplotlib.pyplot as plt
 import Diff_Linear.util as com_util
 from itertools import product
+from datetime import datetime
 
 DIFFER_APPROXIMATION_TABLE = np.zeros((16, 16))
 USABLE_DIFFER = None
-
+FILE = None
 MAX_PRO = 0
 
 SINGLE_ACTIVE_NUM_LIM = 16 / 2
 
 ALL_ACTIVE_NUM_LIM = 5 * 16 / 2
+
+WRITE_FILE = False
+RECORD_NUM = 10 ** 1000000
 
 
 # compute different distributed table
@@ -102,8 +108,8 @@ def bits_to_int_by_active_box(bits: list, active_box_num: list):
 def compute_prob(out_differ: int, round_num: int, prob: float, record_list: list, total_active_num: int):
     global MAX_PRO
     if round_num == 5:
-        print(record_list, "|")
         MAX_PRO = max(MAX_PRO, prob)
+        format_print(record_list)
         return
     usable_out_differ, in_differs, active_num = compute_possible_out_differ(out_differ)
     total_active_num += active_num
@@ -117,7 +123,7 @@ def compute_prob(out_differ: int, round_num: int, prob: float, record_list: list
             return
         n_l = copy.deepcopy(record_list)
         n_out_diff = present.apply_p_box(out_dif)
-        n_l.append([record_list[len(record_list) - 1][1], n_out_diff, prob])
+        n_l.append([record_list[len(record_list) - 1][1], n_out_diff, prob, total_active_num])
         compute_prob(n_out_diff, round_num + 1, prob, n_l, total_active_num)
 
 
@@ -133,8 +139,9 @@ def compute_single_layer_probability(in_differs: list, out_differs: list):
         probs.append(DIFFER_APPROXIMATION_TABLE[ind][oud])
     prob = 1
     for p in probs:
-        prob = prob * (p / (2 ** 4))
-    return prob
+        # prob = prob * (p / (2 ** 4))
+        prob = prob * p
+    return int(prob)
 
 
 # find out_differ that is non-zero different value
@@ -152,6 +159,29 @@ def compute_possible_out_differ(in_differ):
     if active_box_num >= SINGLE_ACTIVE_NUM_LIM:
         return list(), list(), 0
     return list(perm), _4bit_int, active_box_num
+
+
+def create_new_file():
+    global FILE
+    if FILE is not None:
+        FILE.close()
+    FILE = open(str(datetime.now()) + ".txt", 'w')
+
+
+# format print
+def format_print(records: list):
+    for index, record in enumerate(records):
+        print("round-" + str(index) + ":[", end="")
+        print('input differ: %#x' % record[0], end=",")
+        print('output differ(p-boxed): %#x' % record[1], end=",")
+        if index == 0:
+            print("w=1", end=", ")
+        else:
+            print('w=%d' % math.log2(record[2]), end=",")
+        print('all active boxes:%#d' % record[3], end="] ")
+
+    print()
+    print()
 
 
 # main worker

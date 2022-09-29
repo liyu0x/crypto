@@ -73,6 +73,9 @@ P_BOX_BIT_POS = [[0, 0],
 def apply_p_box(num: int):
     bits = com_util.convert_int_64_bits_to_bin(num)
     temp_bits = copy.deepcopy(bits)
+    bits.reverse()
+    temp_bits.reverse()
     for i in range(64):
-        bits[i] = temp_bits[P_BOX_BIT_POS[i][1]]
+        bits[P_BOX_BIT_POS[i][1]] = temp_bits[i]
+    bits.reverse()
     return com_util.convert_bits_to_int(bits)
