@@ -1,3 +1,6 @@
+# have some bugs, fixing
+
+
 # PRESENT CIPHER DDT
 
 ![DDT](https://github.com/liyu0x/crypto/blob/main/Present/ddt.jpg?raw=true)
@@ -22,3 +25,4 @@ probability: ```w/(2^(num of active boxes * 16))```
 # run code:
 
 ```python3 compute_differential_trail.py```
+
