@@ -14,3 +14,9 @@ File Introduction:
 - ```linear_anlysis```: the code for linear cryptanalysis
 - ```simple_ciper```: A simple cipher module mentioned by the tutorial.
 
+difference
+differential trail/path/characteristic
+
+differential
+
+

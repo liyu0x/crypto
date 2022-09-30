@@ -175,10 +175,8 @@ def format_print(records: list):
         print("round-" + str(index) + ":[", end="")
         print('input differ: %#x' % record[0], end=",")
         print('output differ(p-boxed): %#x' % record[1], end=",")
-        if index == 0:
-            print("w=1", end=", ")
-        else:
-            print('w=%d' % math.log(record[2]), end=",")
+
+        print('w=%d' % math.log2(record[2]), end=",")
         print('all active boxes:%#d' % record[3], end="] ")
 
     print()
