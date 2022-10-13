@@ -35,29 +35,31 @@ def compute_ddt():
 # draw ddt table
 def draw_ddt_table():
     fig, ax = plt.subplots()
+
     # hide axes
     fig.patch.set_visible(False)
     ax.axis('off')
     ax.axis('tight')
     color_arr = list()
-    for i in range(16):
-        tl = list()
-        for j in range(16):
-            if DIFFER_APPROXIMATION_TABLE[i][j] == 2:
-                tl.append("red")
-            elif DIFFER_APPROXIMATION_TABLE[i][j] == 4:
-                tl.append('pink')
-            else:
-                tl.append('yellow')
-        color_arr.append(tl)
+    # for i in range(16):
+    #     tl = list()
+    #     for j in range(16):
+    #         if DIFFER_APPROXIMATION_TABLE[i][j] == 2:
+    #             tl.append("red")
+    #         elif DIFFER_APPROXIMATION_TABLE[i][j] == 4:
+    #             tl.append('pink')
+    #         else:
+    #             tl.append('yellow')
+    #     color_arr.append(tl)
     ax.table(cellText=DIFFER_APPROXIMATION_TABLE
              , colLabels=[i for i in range(16)]
              , rowLabels=[i for i in range(16)]
-             , colColours=['green' for i in range(16)]
-             , rowColours=['green' for i in range(16)]
-             , cellColours=color_arr
+             #, colColours=['green' for i in range(16)]
+             #, rowColours=['green' for i in range(16)]
+             #, cellColours=color_arr
              , loc='center')
     fig.tight_layout()
+    plt.suptitle("DELT")
     plt.show()
 
 
@@ -188,3 +190,7 @@ def compute_start(out_differ: int, round_num: int, prob: float, record_list: lis
     compute_ddt()
     compute_differ_out()
     compute_prob(out_differ, round_num, prob, record_list, total_active_num)
+
+
+compute_ddt()
+draw_ddt_table()
