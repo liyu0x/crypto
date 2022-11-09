@@ -45,6 +45,7 @@ def load_data():
 
 
 def crack():
+    gen_mask()
     sub_keys, ori_data, diff_data = load_data()
     counter = [0 for _ in range(2 ** 16)]
     for i in range(len(ori_data)):
@@ -60,11 +61,9 @@ def crack():
             if (ori_c ^ diff_c) == OUT_DIFF:
                 counter[vir_sub_key] += 1
     max_key = max(counter)
-    print(counter.index(max_key))
-    print(sub_keys[ROUND_NUM - 1])
+    print(hex(generate_sub_key(counter.index(max_key))))
+    print(hex(sub_keys[ROUND_NUM - 1]))
 
 
 if __name__ == "__main__":
-    # crack()
-    gen_mask()
-    print(ACTIVE_S_BOX_NUM)
+    crack()
