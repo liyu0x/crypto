@@ -4,9 +4,42 @@ import random
 import util
 
 SIZE = 256
+MSB = 0x80000000
 
 P = [22, 31, 2, 8, 12, 18, 24, 19, 3, 17, 20, 29, 4, 26, 27, 30, 25, 9, 5, 7, 10, 28, 0, 23, 6, 16, 13, 14, 21, 11, 15,
      1]
+
+P1 = [
+    31, 23, 15, 7, 30, 22, 14, 6,
+    29, 21, 13, 5, 28, 20, 12, 4,
+    27, 19, 11, 3, 26, 18, 10, 2,
+    25, 17, 9, 1, 24, 16, 8, 0
+]
+
+
+def perm321(num: int):
+    mask = MSB
+    result = 0
+    for index in range(32):
+        i = P1[index]
+        b = (num >> i) & 0x01
+        if b:
+            result |= mask
+        mask >>= 1
+    return result
+
+
+def perm123(num: int):
+    mask = MSB
+    result = 0
+    for index in range(32):
+        i = P1[31 - index]
+        b = (num >> i) & 0x01
+        if b:
+            result |= mask
+        mask >>= 1
+    return result
+
 
 sfn = [  # [gen, exp]
     [375, 31],  # 101110111
@@ -35,9 +68,6 @@ def rol12(b):
 
 def ror12(b):
     return (b >> 12) | (b << 20)
-
-
-MSB = 0x80000000
 
 
 def perm32(num: int):
@@ -100,9 +130,6 @@ def f(r, k):
     return perm32(b)
 
 
-print(f(1082667520, 9))
-
-
 def en_loki(block: list, keys: list):
     k_l = keys[0]
     k_r = keys[1]
@@ -137,7 +164,7 @@ def de_loki(block: list, keys: list):
     block[1] = r_b ^ k_r
 
 
-def test():
+def notesdsd():
     # 43297fad38e373fe 4c974f1caa59f5d4 ea676b2cb7db2b7a
     key = 0x43297fad38e373fe
     plaintext = 0xc974f1caa59f5d4
@@ -152,4 +179,5 @@ def test():
     print(pls)
     res = util.merge_group_to_64_bits(pls)
 
-# test()
+
+notesdsd()
