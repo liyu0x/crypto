@@ -4,10 +4,37 @@ import present
 IN_DIFF = 0x0000D00D00000000
 OUT_DIFF = 0x0000040400000404
 
-DATA_SIZE = 12
+DATA_SIZE = 6
 
 ROUND_NUM = 5
 SUB_KEY_SIZE = 64
+
+BLOCK_SIZE = 64
+S_BOX_SIZE = 4
+
+ACTIVE_S_BOX_NUM = 0
+
+MASK = None
+
+
+def gen_mask():
+    global MASK, ACTIVE_S_BOX_NUM
+    mask = 0
+    active_num = 0
+    for i in range(int(BLOCK_SIZE / S_BOX_SIZE)):
+        mask |= (0x0 if ((OUT_DIFF >> (i * S_BOX_SIZE)) & 0xF) == 0 else 0xF) << (i * S_BOX_SIZE)
+        active_num += (0 if ((OUT_DIFF >> (i * S_BOX_SIZE)) & 0xF) == 0 else 1)
+    MASK = mask
+    ACTIVE_S_BOX_NUM = active_num
+
+
+def generate_sub_key(key: int):
+    n_key = 0
+    for i in range(int(BLOCK_SIZE / S_BOX_SIZE)):
+        if ((OUT_DIFF >> (i * S_BOX_SIZE)) & 0xF) != 0:
+            n_key |= (key & 0xF) << (i * S_BOX_SIZE)
+            key >>= 4
+    return n_key
 
 
 def load_data():
@@ -27,10 +54,9 @@ def crack():
             print("ERROR")
             continue
         for vir_sub_key in range(2 ** 16):
-            subkey = ((((vir_sub_key >> 12) & 0xf) << 40) | (((vir_sub_key >> 8) & 0xf) << 32) | (
-                    (vir_sub_key >> 4 & 0xf) << 8) | vir_sub_key & 0xf)
-            ori_c = present.decrypt(ori_pair[1], subkey) & 0x00000F0F00000F0F
-            diff_c = present.decrypt(diff_pair[1], subkey) & 0x00000F0F00000F0F
+            subkey = generate_sub_key(vir_sub_key)
+            ori_c = present.decrypt(ori_pair[1], subkey) & MASK
+            diff_c = present.decrypt(diff_pair[1], subkey) & MASK
             if (ori_c ^ diff_c) == OUT_DIFF:
                 counter[vir_sub_key] += 1
     max_key = max(counter)
@@ -38,4 +64,7 @@ def crack():
     print(sub_keys[ROUND_NUM - 1])
 
 
-crack()
+if __name__ == "__main__":
+    # crack()
+    gen_mask()
+    print(ACTIVE_S_BOX_NUM)
