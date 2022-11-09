@@ -1,81 +1,53 @@
-import Diff_Linear.util as com_util
-import copy
-
 S_BOX = [0xC, 0x5, 0x6, 0xB, 0x9, 0x00, 0xA, 0xD, 0x3, 0xE, 0xF, 0x8, 0x4, 0x7, 0x1, 0x2]
-S_BOX_REV = [0x5, 0xE, 0xF, 0x8, 0xC, 0x1, 0x2, 0xD, 0xB, 0x4, 0x6, 0x3, 0x0, 0X7, 0x9]
+S_BOX_REV = [S_BOX.index(i) for i in range(len(S_BOX))]
+P_BOX = [0, 16, 32, 48, 1, 17, 33, 49, 2, 18, 34, 50, 3, 19, 35, 51, 4, 20, 36, 52, 5, 21, 37, 53, 6, 22,
+         38, 54, 7, 23, 39, 55, 8, 24, 40, 56, 9, 25, 41, 57, 10, 26, 42, 58, 11, 27, 43, 59, 12, 28, 44,
+         60, 13, 29, 45, 61, 14, 30, 46, 62, 15, 31, 47, 63]
+P_BOX_REV = [P_BOX.index(i) for i in range(len(P_BOX))]
 
-P_BOX_BIT_POS = [[0, 0],
-                 [1, 16],
-                 [2, 32],
-                 [3, 48],
-                 [4, 1],
-                 [5, 17],
-                 [6, 33],
-                 [7, 49],
-                 [8, 2],
-                 [9, 18],
-                 [10, 34],
-                 [11, 50],
-                 [12, 3],
-                 [13, 19],
-                 [14, 35],
-                 [15, 51],
-                 [16, 4],
-                 [17, 20],
-                 [18, 36],
-                 [19, 52],
-                 [20, 5],
-                 [21, 21],
-                 [22, 37],
-                 [23, 53],
-                 [24, 6],
-                 [25, 22],
-                 [26, 38],
-                 [27, 54],
-                 [28, 7],
-                 [29, 23],
-                 [30, 39],
-                 [31, 55],
-                 [32, 8],
-                 [33, 24],
-                 [34, 40],
-                 [35, 56],
-                 [36, 9],
-                 [37, 25],
-                 [38, 41],
-                 [39, 57],
-                 [40, 10],
-                 [41, 26],
-                 [42, 42],
-                 [43, 58],
-                 [44, 11],
-                 [45, 27],
-                 [46, 43],
-                 [47, 59],
-                 [48, 12],
-                 [49, 28],
-                 [50, 44],
-                 [51, 60],
-                 [52, 13],
-                 [53, 29],
-                 [54, 45],
-                 [55, 61],
-                 [56, 14],
-                 [57, 30],
-                 [58, 46],
-                 [59, 62],
-                 [60, 15],
-                 [61, 31],
-                 [62, 47],
-                 [63, 63]]
+
+def apply_s_rev_box(num: int):
+    result = 0
+    for i in range(16):
+        result |= S_BOX_REV[(num >> (i * 4)) & 0xf] << (4 * i)
+    return result
+
+
+def apply_s_box(num: int):
+    result = 0
+    for i in range(16):
+        result |= S_BOX[(num >> (4 * i)) & 0xf] << (4 * i)
+    return result
 
 
 def apply_p_box(num: int):
-    bits = com_util.convert_int_64_bits_to_bin(num)
-    temp_bits = copy.deepcopy(bits)
-    bits.reverse()
-    temp_bits.reverse()
+    result = 0
     for i in range(64):
-        bits[P_BOX_BIT_POS[i][1]] = temp_bits[i]
-    bits.reverse()
-    return com_util.convert_bits_to_int(bits)
+        result |= ((num >> i) & 0x1) << P_BOX[i]
+    return result
+
+
+def apply_p_rev_box(num: int):
+    result = 0
+    for i in range(64):
+        result |= ((num >> i) & 0x1) << P_BOX_REV[i]
+    return result
+
+
+def encrypt(p: int, key: int):
+    p ^= key
+    result = apply_s_box(p)
+    return apply_p_box(result)
+
+
+def decrypt(c: int, key: int):
+    c = apply_p_rev_box(c)
+    result = apply_s_rev_box(c)
+    result ^= key
+    return result
+
+
+def diff_decrypt(c: int):
+    c = apply_p_rev_box(c)
+    result = apply_s_rev_box(c)
+    return result

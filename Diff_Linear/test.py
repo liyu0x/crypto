@@ -43,7 +43,7 @@ def test_differ():
 
 
 def test():
-    test_linear()
+    #test_linear()
     test_differ()
 
 
