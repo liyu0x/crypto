@@ -5,11 +5,11 @@ import math
 import present
 import numpy as np
 import matplotlib.pyplot as plt
-import Diff_Linear.util as com_util
+import Diff_and_Linear_attack.util as com_util
 from itertools import product
 from datetime import datetime
 
-DIFFER_APPROXIMATION_TABLE = np.zeros((16, 16))
+DIFFER_APPROXIMATION_TABLE = np.zeros((16, 16), dtype=int)
 USABLE_DIFFER = None
 FILE = None
 MAX_PRO = 0
@@ -54,9 +54,9 @@ def draw_ddt_table():
     ax.table(cellText=DIFFER_APPROXIMATION_TABLE
              , colLabels=[i for i in range(16)]
              , rowLabels=[i for i in range(16)]
-             #, colColours=['green' for i in range(16)]
-             #, rowColours=['green' for i in range(16)]
-             #, cellColours=color_arr
+             # , colColours=['green' for i in range(16)]
+             # , rowColours=['green' for i in range(16)]
+             # , cellColours=color_arr
              , loc='center')
     fig.tight_layout()
     plt.suptitle("DELT")
@@ -193,4 +193,4 @@ def compute_start(out_differ: int, round_num: int, prob: float, record_list: lis
 
 
 compute_ddt()
-draw_ddt_table()
+# draw_ddt_table()
